@@ -2,6 +2,17 @@ After reading this post on the MakerCamp Google+ community ( https://plus.google
 I got to thinking this could be a good little test for me as I'm learning Arduino. As such, what's in here may not be ideal
 for the platform, but it's fairly sane as far as the general idea goes.
 
+
+NOTES
+----------
+I've added a servo since taking the breadboard picture. You don't need to add it, but if you want to attach it to power and ground and it's signal to D4. Depending upon
+your servo you may need to adjust the angle values (do so by modifying the consts). If you don't have one make sure nothing is plugged into D4 or disable that part of the code.
+
+The debouncing I put in for button presses may not be right for your buttons, adjust those consts as necessary.
+
+
+OVERVIEW
+----------
 The approach I've taken here is applying the Knuth-Morris-Pratt algorithm ( Details here for the curious and geeky http://en.wikipedia.org/wiki/Knuth–Morris–Pratt_algorithm )
 to this situation. 
 

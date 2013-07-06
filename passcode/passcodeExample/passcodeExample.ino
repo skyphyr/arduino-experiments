@@ -1,10 +1,23 @@
 #include "Passcode.h"
 
+#include <Servo.h>
+
 // Constants for our pin references
 static const int UNLOCKED_LED_PIN = 0;
 static const int LOCKED_LED_PIN = 1;
 static const int BUTTON_1_PIN = 2;
 static const int BUTTON_2_PIN = 3;
+static const int SERVO_PIN = 4;
+
+// The delay between reads when taking a stable (debounced) read
+static const int STABLE_READ_DELAY = 5;
+// The length of time the read must be consistent for a debounced read
+static const int STABLE_READ_TIME = 25;
+
+// The angle to turn the servo to when unlocked
+static const byte UNLOCKED_ANGLE = 166;
+// The angle to turn the servo to when locked
+static const byte LOCKED_ANGLE = 0;
 
 // Keep track of the state of the buttons last time we read them
 boolean lastButton1State;
@@ -16,10 +29,34 @@ boolean lockedState = false;
 // The passcode processing object. It stores and checks the passcode.
 Passcode passcode;
 
+// The lock servo
+Servo lockServo;
 
 boolean wasButtonReleased(int pin, boolean& lastButtonState, boolean buttonPressedState) {
   // Read the current pin
-  int currentButtonState = digitalRead(pin);
+  int currentButtonState;
+  // Check it for stability
+  int previousButtonState = digitalRead(pin);
+  // Count how long
+  int stableCount = 0;
+  // Debounce the button read (ensure the value is stable for STABLE_READ_TIME ms)
+  while (stableCount < STABLE_READ_TIME) {
+    // Delay so we're not reading too fast and can count
+    // the approximate stable time
+    delay(STABLE_READ_DELAY);
+    // read the value
+    currentButtonState = digitalRead(pin);
+    if (currentButtonState == previousButtonState) {
+      // It's remainded stable throughout the delay
+      // so increment the time passed
+      stableCount += STABLE_READ_DELAY;
+    } else {
+      // It's not remained stable, so reset the time passed
+      stableCount = 0;
+      // Set the previous state to the new one
+      previousButtonState = currentButtonState;
+    }
+  } // We'll only get out of this once the value has been consistent for STABLE_READ_TIME ms
   
   // Hold the last button state locally, so we don't dupe the
   // code to update the last button state for each return or risk
@@ -63,6 +100,9 @@ void setup() {
   Button pattern[] = {BUTTON_1, BUTTON_2, BUTTON_1, BUTTON_1, BUTTON_2, BUTTON_2, BUTTON_2, BUTTON_2};
   // Set the passcode, provide the length for safety
   passcode.setPasscode(pattern, 8);
+  
+  // Initialize the lock servo
+  lockServo.attach(SERVO_PIN);
 }
 
 void toggleState() {
@@ -71,6 +111,9 @@ void toggleState() {
   // Toggle the LEDs to reflect the new state.
   digitalWrite(UNLOCKED_LED_PIN, !lockedState);
   digitalWrite(LOCKED_LED_PIN, lockedState);
+  
+  // Move the servo to it's lock position
+  lockServo.write(lockedState ? LOCKED_ANGLE : UNLOCKED_ANGLE);
 }
 
 void loop() {
