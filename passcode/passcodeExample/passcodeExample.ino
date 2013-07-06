@@ -3,6 +3,9 @@
 #include <Servo.h>
 
 // Constants for our pin references
+//! NOTE:
+//! Pins 0 and 1 are used for serial communication, so if you want to
+//! use the Serial, then you'll need to shift the LEDs to other pins.
 static const int UNLOCKED_LED_PIN = 0;
 static const int LOCKED_LED_PIN = 1;
 static const int BUTTON_1_PIN = 2;
