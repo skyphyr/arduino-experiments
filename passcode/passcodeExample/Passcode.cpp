@@ -20,6 +20,9 @@ void Passcode::setPasscode(Button passcode[], byte length)
   // Seeing we're setting the passcode, we should reset the
   // state incase it was part way through on another
   mState = 0;
+
+  // Make sure we don't overflow the mFiniteStateMachine  
+  length = min(length, MAX_PASSCODE_LENGTH);
   
   // Make sure we have some characters
   if (length) {
