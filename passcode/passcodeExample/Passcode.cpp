@@ -22,7 +22,7 @@ void Passcode::setPasscode(Button passcode[], byte length)
   mState = 0;
 
   // Make sure we don't overflow the mFiniteStateMachine  
-  length = min(length, MAX_PASSCODE_LENGTH);
+  length = max(min(length, MAX_PASSCODE_LENGTH), 0);
   
   // Make sure we have some characters
   if (length) {
